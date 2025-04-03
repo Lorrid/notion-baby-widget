@@ -314,6 +314,72 @@
             background-color: var(--button-bg);
             color: var(--button-text);
         }
+        
+        .url-dialog {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        
+        .url-dialog-content {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90vw;
+        }
+        
+        .url-dialog h4 {
+            margin-top: 0;
+            color: var(--settings-title-color);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .url-container {
+            display: flex;
+            margin: 15px 0;
+        }
+        
+        .url-container input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px 0 0 4px;
+            font-size: 13px;
+        }
+        
+        .url-container button {
+            padding: 10px 15px;
+            background: var(--button-bg);
+            color: white;
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .url-note {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        #closeUrlDialog {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 0 auto;
+        }
     </style>
 </head>
 <body>
@@ -587,23 +653,22 @@
             const isEmbedded = checkIfEmbedded();
             if (isEmbedded) {
                 document.body.classList.add('embedded');
-                
-                // Get URL parameters for settings
-                const urlParams = new URLSearchParams(window.location.search);
-                
-                // If URL has settings parameter, use it to override localStorage
-                if (urlParams.has('settings')) {
-                    try {
-                        const decodedSettings = decodeURIComponent(urlParams.get('settings'));
-                        localStorage.setItem('babyCountdownSettings', decodedSettings);
-                    } catch (e) {
-                        console.error('Error parsing settings from URL', e);
-                    }
+            }
+            
+            // Always check for URL parameters regardless of embedded state
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // If URL has settings parameter, use it (this takes precedence over localStorage)
+            if (urlParams.has('settings')) {
+                try {
+                    const decodedSettings = decodeURIComponent(urlParams.get('settings'));
+                    localStorage.setItem('babyCountdownSettings', decodedSettings);
+                } catch (e) {
+                    console.error('Error parsing settings from URL', e);
                 }
             }
             
             // Check if we're in settings mode
-            const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.has('mode') && urlParams.get('mode') === 'settings') {
                 // We're in the GitHub page in settings mode
                 // Open settings panel immediately
@@ -612,17 +677,8 @@
                 // Add a message to indicate we're in settings mode
                 const settingsMessage = document.createElement('div');
                 settingsMessage.className = 'settings-message';
-                settingsMessage.innerHTML = 'You are editing settings for your embedded widget. <br>Changes will be applied when you save.';
+                settingsMessage.innerHTML = 'You are editing settings for your embedded widget. <br>After saving, copy the new URL to update your Notion embed.';
                 document.querySelector('.settings-panel').prepend(settingsMessage);
-                
-                // Add event listener to the save button to close the window after saving
-                document.querySelector('.settings-panel button:not(.btn-cancel)').addEventListener('click', function() {
-                    // Wait a moment for settings to save
-                    setTimeout(function() {
-                        // Show confirmation message
-                        alert('Settings saved! You can now close this window and refresh your Notion page to see the changes.');
-                    }, 500);
-                });
             }
         }
         
@@ -807,16 +863,74 @@
             // Update countdown
             updateCountdown();
             
-            // Save all settings to localStorage
+            // Save all settings to localStorage AND generate a settings URL
             saveSettings();
             
             // Close the settings panel
             closeSettings();
             
-            // Update URL with settings for embedded mode
-            if (checkIfEmbedded()) {
-                updateEmbedUrl();
+            // Generate a shareable URL with all settings
+            const settingsUrl = generateSettingsUrl();
+            
+            // If in settings mode on GitHub page, show the URL to copy
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('mode') && urlParams.get('mode') === 'settings') {
+                // Show a dialog with the URL to copy
+                const urlDialog = document.createElement('div');
+                urlDialog.className = 'url-dialog';
+                urlDialog.innerHTML = `
+                    <div class="url-dialog-content">
+                        <h4>Copy this URL to your Notion embed</h4>
+                        <p>To make your settings work across all devices and browsers, you need to update your Notion embed with this URL:</p>
+                        <div class="url-container">
+                            <input type="text" id="settingsUrlInput" value="${settingsUrl}" readonly>
+                            <button id="copyUrlButton">Copy</button>
+                        </div>
+                        <p class="url-note">After copying, replace your current embed URL in Notion with this one.</p>
+                        <button id="closeUrlDialog">Close</button>
+                    </div>
+                `;
+                document.body.appendChild(urlDialog);
+                
+                // Add event listeners
+                document.getElementById('copyUrlButton').addEventListener('click', function() {
+                    const urlInput = document.getElementById('settingsUrlInput');
+                    urlInput.select();
+                    document.execCommand('copy');
+                    this.textContent = 'Copied!';
+                });
+                
+                document.getElementById('closeUrlDialog').addEventListener('click', function() {
+                    document.body.removeChild(urlDialog);
+                });
             }
+        }
+        
+        // Function to generate a settings URL
+        function generateSettingsUrl() {
+            const settings = {
+                dueDate: document.getElementById('dueDateInput').value,
+                bgColor: document.getElementById('bgColor').value,
+                frameColor: document.getElementById('frameColor').value,
+                showFrame: document.getElementById('showFrame').checked,
+                frameThickness: document.getElementById('frameThickness').value,
+                frameRadius: document.getElementById('frameRadius').value,
+                fontFamily: document.getElementById('fontFamily').value,
+                fontSize: document.getElementById('fontSize').value,
+                showTime: document.getElementById('showTime').checked,
+                titleText: document.getElementById('titleText').value,
+                titleSize: document.getElementById('titleSize').value,
+                titleFont: document.getElementById('titleFont').value,
+                showTitle: document.getElementById('showTitle').checked,
+                babyName: document.getElementById('babyName').value,
+                notionTheme: document.querySelector('input[name="notionTheme"]:checked').value
+            };
+            
+            const settingsStr = JSON.stringify(settings);
+            const encodedSettings = encodeURIComponent(settingsStr);
+            const baseUrl = window.location.href.split('?')[0]; // Remove any existing parameters
+            
+            return baseUrl + '?settings=' + encodedSettings;
         }
         
         // Function to save settings to localStorage
@@ -840,20 +954,6 @@
             };
             
             localStorage.setItem('babyCountdownSettings', JSON.stringify(settings));
-        }
-        
-        // Function to update the URL with settings for embedded mode
-        function updateEmbedUrl() {
-            const settings = localStorage.getItem('babyCountdownSettings');
-            if (settings) {
-                const encodedSettings = encodeURIComponent(settings);
-                // Only update the URL if we're not in settings mode
-                const urlParams = new URLSearchParams(window.location.search);
-                if (!urlParams.has('mode')) {
-                    const newUrl = window.location.pathname + '?settings=' + encodedSettings;
-                    window.history.replaceState({}, document.title, newUrl);
-                }
-            }
         }
         
         // Function to load settings from localStorage
