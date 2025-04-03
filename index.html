@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baby Countdown and Age Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Add Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bubblegum+Sans&family=Comic+Neue:ital,wght@0,400;0,700;1,400;1,700&family=Indie+Flower&family=Itim&family=Luckiest+Guy&family=Montserrat:ital,wght@0,400;0,700;1,400;1,700&family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Patrick+Hand&family=Roboto:ital,wght@0,400;0,700;1,400;1,700&family=Schoolbell&family=Sniglet&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #4361ee;
@@ -255,6 +259,27 @@
             margin-bottom: 0;
             display: inline;
         }
+
+        .font-option {
+            font-size: 16px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .font-option:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        
+        .font-category {
+            font-weight: bold;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 3px;
+        }
     </style>
 </head>
 <body>
@@ -301,29 +326,38 @@
                 <div class="form-group">
                     <label for="titleFont">Title Font:</label>
                     <select id="titleFont">
-                        <option value="Arial">Arial</option>
-                        <option value="'Segoe UI'">Segoe UI</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="'Trebuchet MS'">Trebuchet MS</option>
-                        <option value="'Helvetica Neue'">Helvetica Neue</option>
-                        <option value="'Times New Roman'">Times New Roman</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Garamond">Garamond</option>
-                        <option value="'Courier New'">Courier New</option>
-                        <option value="'Palatino Linotype'">Palatino Linotype</option>
-                        <option value="'Book Antiqua'">Book Antiqua</option>
-                        <option value="'Century Gothic'">Century Gothic</option>
-                        <option value="Tahoma">Tahoma</option>
-                        <option value="'Lucida Sans'">Lucida Sans</option>
-                        <option value="'Lucida Grande'">Lucida Grande</option>
-                        <option value="Impact">Impact</option>
-                        <option value="'Franklin Gothic Medium'">Franklin Gothic</option>
-                        <option value="'Gill Sans'">Gill Sans</option>
-                        <option value="'Trebuchet MS'">Trebuchet MS</option>
-                        <option value="'Arial Narrow'">Arial Narrow</option>
-                        <option value="'Roboto', sans-serif">Roboto</option>
-                        <option value="'Open Sans', sans-serif">Open Sans</option>
-                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <optgroup label="Standard Fonts">
+                            <option value="Arial" style="font-family: Arial">Arial</option>
+                            <option value="'Segoe UI'" style="font-family: 'Segoe UI'">Segoe UI</option>
+                            <option value="Verdana" style="font-family: Verdana">Verdana</option>
+                            <option value="Helvetica" style="font-family: Helvetica">Helvetica</option>
+                            <option value="Tahoma" style="font-family: Tahoma">Tahoma</option>
+                            <option value="'Times New Roman'" style="font-family: 'Times New Roman'">Times New Roman</option>
+                            <option value="Georgia" style="font-family: Georgia">Georgia</option>
+                        </optgroup>
+                        <optgroup label="Baby & Fun Fonts">
+                            <option value="'Bubblegum Sans', cursive" style="font-family: 'Bubblegum Sans', cursive">Bubblegum Sans</option>
+                            <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive">Comic Neue</option>
+                            <option value="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive">Indie Flower</option>
+                            <option value="'Itim', cursive" style="font-family: 'Itim', cursive">Itim</option>
+                            <option value="'Luckiest Guy', cursive" style="font-family: 'Luckiest Guy', cursive">Luckiest Guy</option>
+                            <option value="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive">Patrick Hand</option>
+                            <option value="'Schoolbell', cursive" style="font-family: 'Schoolbell', cursive">Schoolbell</option>
+                            <option value="'Sniglet', cursive" style="font-family: 'Sniglet', cursive">Sniglet</option>
+                        </optgroup>
+                        <optgroup label="Modern Fonts">
+                            <option value="'Roboto', sans-serif" style="font-family: 'Roboto', sans-serif">Roboto</option>
+                            <option value="'Open Sans', sans-serif" style="font-family: 'Open Sans', sans-serif">Open Sans</option>
+                            <option value="'Montserrat', sans-serif" style="font-family: 'Montserrat', sans-serif">Montserrat</option>
+                        </optgroup>
+                        <optgroup label="Italic Fonts">
+                            <option value="'Comic Neue', cursive, italic" style="font-family: 'Comic Neue', cursive; font-style: italic">Comic Neue Italic</option>
+                            <option value="'Roboto', sans-serif, italic" style="font-family: 'Roboto', sans-serif; font-style: italic">Roboto Italic</option>
+                            <option value="'Open Sans', sans-serif, italic" style="font-family: 'Open Sans', sans-serif; font-style: italic">Open Sans Italic</option>
+                            <option value="'Montserrat', sans-serif, italic" style="font-family: 'Montserrat', sans-serif; font-style: italic">Montserrat Italic</option>
+                            <option value="Georgia, serif, italic" style="font-family: Georgia, serif; font-style: italic">Georgia Italic</option>
+                            <option value="'Times New Roman', serif, italic" style="font-family: 'Times New Roman', serif; font-style: italic">Times New Roman Italic</option>
+                        </optgroup>
                     </select>
                 </div>
                 
@@ -388,29 +422,38 @@
                 <div class="form-group">
                     <label for="fontFamily">Content Font:</label>
                     <select id="fontFamily">
-                        <option value="Arial">Arial</option>
-                        <option value="'Segoe UI'">Segoe UI</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="'Trebuchet MS'">Trebuchet MS</option>
-                        <option value="'Helvetica Neue'">Helvetica Neue</option>
-                        <option value="'Times New Roman'">Times New Roman</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Garamond">Garamond</option>
-                        <option value="'Courier New'">Courier New</option>
-                        <option value="'Palatino Linotype'">Palatino Linotype</option>
-                        <option value="'Book Antiqua'">Book Antiqua</option>
-                        <option value="'Century Gothic'">Century Gothic</option>
-                        <option value="Tahoma">Tahoma</option>
-                        <option value="'Lucida Sans'">Lucida Sans</option>
-                        <option value="'Lucida Grande'">Lucida Grande</option>
-                        <option value="Impact">Impact</option>
-                        <option value="'Franklin Gothic Medium'">Franklin Gothic</option>
-                        <option value="'Gill Sans'">Gill Sans</option>
-                        <option value="'Trebuchet MS'">Trebuchet MS</option>
-                        <option value="'Arial Narrow'">Arial Narrow</option>
-                        <option value="'Roboto', sans-serif">Roboto</option>
-                        <option value="'Open Sans', sans-serif">Open Sans</option>
-                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                        <optgroup label="Standard Fonts">
+                            <option value="Arial" style="font-family: Arial">Arial</option>
+                            <option value="'Segoe UI'" style="font-family: 'Segoe UI'">Segoe UI</option>
+                            <option value="Verdana" style="font-family: Verdana">Verdana</option>
+                            <option value="Helvetica" style="font-family: Helvetica">Helvetica</option>
+                            <option value="Tahoma" style="font-family: Tahoma">Tahoma</option>
+                            <option value="'Times New Roman'" style="font-family: 'Times New Roman'">Times New Roman</option>
+                            <option value="Georgia" style="font-family: Georgia">Georgia</option>
+                        </optgroup>
+                        <optgroup label="Baby & Fun Fonts">
+                            <option value="'Bubblegum Sans', cursive" style="font-family: 'Bubblegum Sans', cursive">Bubblegum Sans</option>
+                            <option value="'Comic Neue', cursive" style="font-family: 'Comic Neue', cursive">Comic Neue</option>
+                            <option value="'Indie Flower', cursive" style="font-family: 'Indie Flower', cursive">Indie Flower</option>
+                            <option value="'Itim', cursive" style="font-family: 'Itim', cursive">Itim</option>
+                            <option value="'Luckiest Guy', cursive" style="font-family: 'Luckiest Guy', cursive">Luckiest Guy</option>
+                            <option value="'Patrick Hand', cursive" style="font-family: 'Patrick Hand', cursive">Patrick Hand</option>
+                            <option value="'Schoolbell', cursive" style="font-family: 'Schoolbell', cursive">Schoolbell</option>
+                            <option value="'Sniglet', cursive" style="font-family: 'Sniglet', cursive">Sniglet</option>
+                        </optgroup>
+                        <optgroup label="Modern Fonts">
+                            <option value="'Roboto', sans-serif" style="font-family: 'Roboto', sans-serif">Roboto</option>
+                            <option value="'Open Sans', sans-serif" style="font-family: 'Open Sans', sans-serif">Open Sans</option>
+                            <option value="'Montserrat', sans-serif" style="font-family: 'Montserrat', sans-serif">Montserrat</option>
+                        </optgroup>
+                        <optgroup label="Italic Fonts">
+                            <option value="'Comic Neue', cursive, italic" style="font-family: 'Comic Neue', cursive; font-style: italic">Comic Neue Italic</option>
+                            <option value="'Roboto', sans-serif, italic" style="font-family: 'Roboto', sans-serif; font-style: italic">Roboto Italic</option>
+                            <option value="'Open Sans', sans-serif, italic" style="font-family: 'Open Sans', sans-serif; font-style: italic">Open Sans Italic</option>
+                            <option value="'Montserrat', sans-serif, italic" style="font-family: 'Montserrat', sans-serif; font-style: italic">Montserrat Italic</option>
+                            <option value="Georgia, serif, italic" style="font-family: Georgia, serif; font-style: italic">Georgia Italic</option>
+                            <option value="'Times New Roman', serif, italic" style="font-family: 'Times New Roman', serif; font-style: italic">Times New Roman Italic</option>
+                        </optgroup>
                     </select>
                 </div>
                 
@@ -509,11 +552,58 @@
                 document.getElementById('age').style.display = 'none';
                 document.getElementById('countdown').style.display = 'block';
             } else {
-                const babyAge = new Date(now - expectedBirthDate);
-                const months = babyAge.getUTCMonth();
-                const days = babyAge.getUTCDate() - 1; // Adjust for how Date object works
+                // Calculate age properly
+                let years = 0;
+                let months = 0;
+                let days = 0;
+                
+                // Get birth date components
+                const birthYear = expectedBirthDate.getFullYear();
+                const birthMonth = expectedBirthDate.getMonth();
+                const birthDay = expectedBirthDate.getDate();
+                
+                // Get current date components
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth();
+                const currentDay = now.getDate();
+                
+                // Calculate years
+                years = currentYear - birthYear;
+                
+                // Calculate months
+                if (currentMonth >= birthMonth) {
+                    months = currentMonth - birthMonth;
+                } else {
+                    years--;
+                    months = 12 + currentMonth - birthMonth;
+                }
+                
+                // Calculate days
+                if (currentDay >= birthDay) {
+                    days = currentDay - birthDay;
+                } else {
+                    months--;
+                    // Get the last day of the previous month
+                    const lastMonth = new Date(currentYear, currentMonth, 0);
+                    days = lastMonth.getDate() - birthDay + currentDay;
+                    
+                    // Adjust if months became negative
+                    if (months < 0) {
+                        months = 11;
+                        years--;
+                    }
+                }
+                
+                // Format the age string based on the age
+                let ageString = '';
+                if (years > 0) {
+                    ageString = `${years} ${years === 1 ? 'year' : 'years'}, ${months} ${months === 1 ? 'month' : 'months'}, ${days} ${days === 1 ? 'day' : 'days'} old`;
+                } else {
+                    ageString = `${months} ${months === 1 ? 'month' : 'months'}, ${days} ${days === 1 ? 'day' : 'days'} old`;
+                }
+                
                 document.getElementById('age').style.display = 'block';
-                document.getElementById('age').innerHTML = `${namePrefix} is ${months} months and ${days} days old`;
+                document.getElementById('age').innerHTML = `${namePrefix} is ${ageString}`;
                 document.getElementById('countdown').style.display = 'none';
             }
         }
