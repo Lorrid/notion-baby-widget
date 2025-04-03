@@ -473,12 +473,14 @@
                 document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
                 document.querySelector('.container').style.borderStyle = 'solid';
                 document.querySelector('.container').style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
+                document.querySelector('.container').style.backgroundColor = bgColor;
+                document.body.style.backgroundColor = 'var(--bg-color)'; // Reset body to default background
             } else {
                 document.querySelector('.container').style.border = 'none';
                 document.querySelector('.container').style.borderRadius = '0';
                 document.querySelector('.container').style.boxShadow = 'none'; // Remove the box shadow
-                // Apply background color to the whole page if frame is disabled
-                document.body.style.backgroundColor = bgColor;
+                document.body.style.backgroundColor = bgColor; // Apply background color to the whole page
+                document.querySelector('.container').style.backgroundColor = 'transparent'; // Make container transparent
             }
             
             // Apply settings to the content
