@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Baby Countdown and Age Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,10 +21,41 @@
             padding: 20px;
             border-radius: 8px;
             background-color: white;
+            position: relative;
+            width: 300px;
         }
         .countdown, .age {
             font-size: 1.5em;
             margin: 10px 0;
+        }
+        .settings-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        .settings-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .settings-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+        }
+        .settings-panel input,
+        .settings-panel select {
+            margin-bottom: 10px;
+            width: 100%;
         }
     </style>
 </head>
@@ -32,21 +64,57 @@
         <h2>Baby Due Date Countdown</h2>
         <div id="countdown" class="countdown"></div>
         <div id="age" class="age" style="display:none;"></div>
+        <div class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></div>
+    </div>
+
+    <!-- Settings Popup -->
+    <div class="settings-popup" id="settingsPopup">
+        <div class="settings-panel">
+            <h3>Settings</h3>
+            <label for="bgColor">Background Color:</label>
+            <input type="color" id="bgColor" value="#ffffff">
+            
+            <label for="frameThickness">Frame Thickness (px):</label>
+            <input type="number" id="frameThickness" value="2" min="1">
+
+            <label for="frameRadius">Frame Edge Rounding (px):</label>
+            <input type="number" id="frameRadius" value="8" min="0">
+            
+            <label for="fontFamily">Font:</label>
+            <select id="fontFamily">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            
+            <label for="fontSize">Font Size (px):</label>
+            <input type="number" id="fontSize" value="16" min="10" max="40">
+            
+            <label for="showTime">Show Hours & Minutes:</label>
+            <input type="checkbox" id="showTime" checked>
+            
+            <button onclick="applySettings()">Apply</button>
+            <button onclick="closeSettings()">Close</button>
+        </div>
     </div>
 
     <script>
         // Set the expected birth date here
         const expectedBirthDate = new Date('2025-08-01T00:00:00'); // Example: Set your expected date here
-
+        
+        // Function to update the countdown and age display
         function updateCountdown() {
             const now = new Date();
             const timeDiff = expectedBirthDate - now;
+            const showHoursMinutes = document.getElementById('showTime').checked;
 
             if (timeDiff > 0) {
                 const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
                 const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                 const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-                document.getElementById('countdown').innerHTML = `${days} days, ${hours} hours, ${minutes} minutes until baby arrives`;
+                const timeStr = showHoursMinutes ? `${hours} hours, ${minutes} minutes` : '';
+                document.getElementById('countdown').innerHTML = `${days} days ${timeStr} until birth`;
                 document.getElementById('age').style.display = 'none';
             } else {
                 const babyAge = new Date(now - expectedBirthDate);
@@ -58,8 +126,37 @@
             }
         }
 
+        // Set interval for countdown update
         setInterval(updateCountdown, 60000); // Update every minute
         updateCountdown(); // Initial update
+
+        // Function to open settings panel
+        function openSettings() {
+            document.getElementById('settingsPopup').style.display = 'flex';
+        }
+
+        // Function to close settings panel
+        function closeSettings() {
+            document.getElementById('settingsPopup').style.display = 'none';
+        }
+
+        // Apply the settings from the form
+        function applySettings() {
+            const bgColor = document.getElementById('bgColor').value;
+            const frameThickness = document.getElementById('frameThickness').value;
+            const frameRadius = document.getElementById('frameRadius').value;
+            const fontFamily = document.getElementById('fontFamily').value;
+            const fontSize = document.getElementById('fontSize').value;
+
+            // Apply settings to the container
+            document.querySelector('.container').style.backgroundColor = bgColor;
+            document.querySelector('.container').style.borderWidth = `${frameThickness}px`;
+            document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
+            document.querySelector('.countdown').style.fontFamily = fontFamily;
+            document.querySelector('.age').style.fontFamily = fontFamily;
+            document.querySelector('.countdown').style.fontSize = `${fontSize}px`;
+            document.querySelector('.age').style.fontSize = `${fontSize}px`;
+        }
     </script>
 </body>
 </html>
