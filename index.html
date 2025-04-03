@@ -472,9 +472,11 @@
                 document.querySelector('.container').style.borderColor = frameColor;
                 document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
                 document.querySelector('.container').style.borderStyle = 'solid';
+                document.querySelector('.container').style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
             } else {
                 document.querySelector('.container').style.border = 'none';
                 document.querySelector('.container').style.borderRadius = '0';
+                document.querySelector('.container').style.boxShadow = 'none'; // Remove the box shadow
                 // Apply background color to the whole page if frame is disabled
                 document.body.style.backgroundColor = bgColor;
             }
