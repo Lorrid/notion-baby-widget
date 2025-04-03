@@ -380,6 +380,45 @@
             display: block;
             margin: 0 auto;
         }
+        
+        .copy-link-btn {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background-color: var(--button-bg);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s;
+        }
+        
+        .copy-link-btn:hover {
+            background-color: var(--button-hover);
+        }
+        
+        body.embedded .copy-link-btn {
+            display: none;
+        }
+        
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -390,6 +429,9 @@
     </div>
     
     <div class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></div>
+    
+    <!-- Copy Link Button (only visible in non-embedded mode) -->
+    <div class="copy-link-btn" onclick="showCopyLinkDialog()"><i class="fas fa-link"></i> Copy Link</div>
 
     <!-- Settings Popup -->
     <div class="settings-popup" id="settingsPopup">
@@ -863,47 +905,61 @@
             // Update countdown
             updateCountdown();
             
-            // Save all settings to localStorage AND generate a settings URL
+            // Save all settings to localStorage
             saveSettings();
             
             // Close the settings panel
             closeSettings();
             
+            // If in settings mode on GitHub page, show a notification that settings are saved
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('mode') && urlParams.get('mode') === 'settings') {
+                // Show a notification that settings are saved and they can copy the link when ready
+                const notification = document.createElement('div');
+                notification.className = 'notification';
+                notification.innerHTML = 'Settings saved! You can now see your changes and copy the link when ready.';
+                document.body.appendChild(notification);
+                
+                // Remove notification after 3 seconds
+                setTimeout(function() {
+                    document.body.removeChild(notification);
+                }, 3000);
+            }
+        }
+        
+        // Function to show copy link dialog
+        function showCopyLinkDialog() {
             // Generate a shareable URL with all settings
             const settingsUrl = generateSettingsUrl();
             
-            // If in settings mode on GitHub page, show the URL to copy
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('mode') && urlParams.get('mode') === 'settings') {
-                // Show a dialog with the URL to copy
-                const urlDialog = document.createElement('div');
-                urlDialog.className = 'url-dialog';
-                urlDialog.innerHTML = `
-                    <div class="url-dialog-content">
-                        <h4>Copy this URL to your Notion embed</h4>
-                        <p>To make your settings work across all devices and browsers, you need to update your Notion embed with this URL:</p>
-                        <div class="url-container">
-                            <input type="text" id="settingsUrlInput" value="${settingsUrl}" readonly>
-                            <button id="copyUrlButton">Copy</button>
-                        </div>
-                        <p class="url-note">After copying, replace your current embed URL in Notion with this one.</p>
-                        <button id="closeUrlDialog">Close</button>
+            // Show a dialog with the URL to copy
+            const urlDialog = document.createElement('div');
+            urlDialog.className = 'url-dialog';
+            urlDialog.innerHTML = `
+                <div class="url-dialog-content">
+                    <h4>Copy this URL to your Notion embed</h4>
+                    <p>To make your settings work across all devices and browsers, use this URL in your Notion embed:</p>
+                    <div class="url-container">
+                        <input type="text" id="settingsUrlInput" value="${settingsUrl}" readonly>
+                        <button id="copyUrlButton">Copy</button>
                     </div>
-                `;
-                document.body.appendChild(urlDialog);
-                
-                // Add event listeners
-                document.getElementById('copyUrlButton').addEventListener('click', function() {
-                    const urlInput = document.getElementById('settingsUrlInput');
-                    urlInput.select();
-                    document.execCommand('copy');
-                    this.textContent = 'Copied!';
-                });
-                
-                document.getElementById('closeUrlDialog').addEventListener('click', function() {
-                    document.body.removeChild(urlDialog);
-                });
-            }
+                    <p class="url-note">After copying, replace your current embed URL in Notion with this one.</p>
+                    <button id="closeUrlDialog">Close</button>
+                </div>
+            `;
+            document.body.appendChild(urlDialog);
+            
+            // Add event listeners
+            document.getElementById('copyUrlButton').addEventListener('click', function() {
+                const urlInput = document.getElementById('settingsUrlInput');
+                urlInput.select();
+                document.execCommand('copy');
+                this.textContent = 'Copied!';
+            });
+            
+            document.getElementById('closeUrlDialog').addEventListener('click', function() {
+                document.body.removeChild(urlDialog);
+            });
         }
         
         // Function to generate a settings URL
