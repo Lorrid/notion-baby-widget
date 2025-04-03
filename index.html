@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baby Countdown and Age Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f3f4f6;
+        }
+        .container {
+            text-align: center;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+        }
+        .countdown, .age {
+            font-size: 1.5em;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Baby Due Date Countdown</h2>
+        <div id="countdown" class="countdown"></div>
+        <div id="age" class="age" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Set the expected birth date here
+        const expectedBirthDate = new Date('2025-08-01T00:00:00'); // Example: Set your expected date here
+
+        function updateCountdown() {
+            const now = new Date();
+            const timeDiff = expectedBirthDate - now;
+
+            if (timeDiff > 0) {
+                const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('countdown').innerHTML = `${days} days, ${hours} hours, ${minutes} minutes until baby arrives`;
+                document.getElementById('age').style.display = 'none';
+            } else {
+                const babyAge = new Date(now - expectedBirthDate);
+                const months = babyAge.getUTCMonth();
+                const days = babyAge.getUTCDate();
+                document.getElementById('age').style.display = 'block';
+                document.getElementById('age').innerHTML = `Baby is ${months} months and ${days} days old`;
+                document.getElementById('countdown').style.display = 'none';
+            }
+        }
+
+        setInterval(updateCountdown, 60000); // Update every minute
+        updateCountdown(); // Initial update
+    </script>
+</body>
+</html>
