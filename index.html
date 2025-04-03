@@ -6,35 +6,77 @@
     <title>Baby Countdown and Age Tracker</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4361ee;
+            --text-color: #333;
+            --bg-color: #f8f9fa;
+            --panel-bg: #ffffff;
+            --border-color: #e0e0e0;
+            --input-bg: #f0f0f0;
+            --input-border: #d0d0d0;
+            --button-bg: #4361ee;
+            --button-hover: #3a56d4;
+            --button-text: white;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
-            background-color: #f3f4f6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s;
         }
+
         .container {
             text-align: center;
-            border: 2px solid #ccc;
-            padding: 20px;
-            border-radius: 8px;
-            background-color: white;
+            border: 2px solid var(--border-color);
+            padding: 30px;
+            border-radius: 12px;
+            background-color: var(--panel-bg);
             position: relative;
-            width: 300px;
+            width: 350px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
         }
+
+        .title {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
         .countdown, .age {
             font-size: 1.5em;
-            margin: 10px 0;
+            margin: 15px 0;
+            line-height: 1.4;
         }
+
         .settings-btn {
             position: fixed;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
+            top: 15px;
+            right: 15px;
+            font-size: 22px;
             cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background-color: var(--panel-bg);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s;
         }
+
+        .settings-btn:hover {
+            transform: rotate(30deg);
+        }
+
         .settings-popup {
             display: none;
             position: fixed;
@@ -42,25 +84,132 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.4);
             justify-content: center;
             align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(3px);
         }
+
         .settings-panel {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            width: 300px;
+            background-color: var(--panel-bg);
+            padding: 25px;
+            border-radius: 12px;
+            width: 400px;
             max-height: 80vh;
             overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
         }
-        .settings-panel input,
-        .settings-panel select {
-            margin-bottom: 10px;
-            width: 100%;
-        }
-        .title {
+
+        .settings-panel h3 {
             margin-top: 0;
+            color: var(--primary-color);
+            font-size: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .settings-group {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .settings-group:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .settings-group-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .settings-panel input[type="text"],
+        .settings-panel input[type="date"],
+        .settings-panel input[type="number"],
+        .settings-panel select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            background-color: var(--input-bg);
+            font-size: 14px;
+            transition: border 0.2s;
+        }
+
+        .settings-panel input[type="text"]:focus,
+        .settings-panel input[type="date"]:focus,
+        .settings-panel input[type="number"]:focus,
+        .settings-panel select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+        }
+
+        .color-picker input[type="color"] {
+            width: 50px;
+            height: 30px;
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .settings-panel button {
+            padding: 8px 16px;
+            background-color: var(--button-bg);
+            color: var(--button-text);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .settings-panel button:hover {
+            background-color: var(--button-hover);
+        }
+
+        .settings-panel button.btn-cancel {
+            background-color: transparent;
+            border: 1px solid var(--button-bg);
+            color: var(--button-bg);
+        }
+
+        .settings-panel button.btn-cancel:hover {
+            background-color: rgba(67, 97, 238, 0.1);
         }
     </style>
 </head>
@@ -76,54 +225,152 @@
     <!-- Settings Popup -->
     <div class="settings-popup" id="settingsPopup">
         <div class="settings-panel">
-            <h3>Settings</h3>
+            <h3>Customize Your Countdown</h3>
             
-            <label for="dueDateInput">Due Date:</label>
-            <input type="date" id="dueDateInput">
+            <div class="settings-group">
+                <div class="settings-group-title">Basic Information</div>
+                
+                <div class="form-group">
+                    <label for="babyName">Baby Name:</label>
+                    <input type="text" id="babyName" placeholder="Enter baby name (optional)">
+                </div>
+                
+                <div class="form-group">
+                    <label for="dueDateInput">Due Date:</label>
+                    <input type="date" id="dueDateInput">
+                </div>
+            </div>
             
-            <label for="titleText">Title Text:</label>
-            <input type="text" id="titleText" value="Baby Due Date Countdown">
+            <div class="settings-group">
+                <div class="settings-group-title">Title Settings</div>
+                
+                <div class="form-group">
+                    <label for="titleText">Title Text:</label>
+                    <input type="text" id="titleText" value="Baby Due Date Countdown">
+                </div>
+                
+                <div class="form-group">
+                    <label for="titleSize">Title Size (px):</label>
+                    <input type="number" id="titleSize" value="24" min="10" max="50">
+                </div>
+                
+                <div class="form-group">
+                    <label for="titleFont">Title Font:</label>
+                    <select id="titleFont">
+                        <option value="Arial">Arial</option>
+                        <option value="'Segoe UI'">Segoe UI</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="'Trebuchet MS'">Trebuchet MS</option>
+                        <option value="'Helvetica Neue'">Helvetica Neue</option>
+                        <option value="'Times New Roman'">Times New Roman</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Garamond">Garamond</option>
+                        <option value="'Courier New'">Courier New</option>
+                        <option value="'Palatino Linotype'">Palatino Linotype</option>
+                        <option value="'Book Antiqua'">Book Antiqua</option>
+                        <option value="'Century Gothic'">Century Gothic</option>
+                        <option value="Tahoma">Tahoma</option>
+                        <option value="'Lucida Sans'">Lucida Sans</option>
+                        <option value="'Lucida Grande'">Lucida Grande</option>
+                        <option value="Impact">Impact</option>
+                        <option value="'Franklin Gothic Medium'">Franklin Gothic</option>
+                        <option value="'Gill Sans'">Gill Sans</option>
+                        <option value="'Trebuchet MS'">Trebuchet MS</option>
+                        <option value="'Arial Narrow'">Arial Narrow</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                    </select>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="showTitle" checked>
+                    <label for="showTitle">Show Title</label>
+                </div>
+            </div>
             
-            <label for="titleSize">Title Size (px):</label>
-            <input type="number" id="titleSize" value="24" min="10" max="50">
-            
-            <label for="titleFont">Title Font:</label>
-            <select id="titleFont">
-                <option value="Arial">Arial</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-            </select>
-            
-            <label for="showTitle">Show Title:</label>
-            <input type="checkbox" id="showTitle" checked>
-            
-            <label for="bgColor">Background Color:</label>
-            <input type="color" id="bgColor" value="#ffffff">
-            
-            <label for="frameThickness">Frame Thickness (px):</label>
-            <input type="number" id="frameThickness" value="2" min="1">
+            <div class="settings-group">
+                <div class="settings-group-title">Appearance</div>
+                
+                <div class="form-group">
+                    <label>Background Color:</label>
+                    <div class="color-picker">
+                        <input type="color" id="bgColor" value="#ffffff">
+                        <span id="bgColorCode">#ffffff</span>
+                    </div>
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="showFrame" checked>
+                    <label for="showFrame">Show Frame</label>
+                </div>
+                
+                <div class="form-group" id="frameSettings">
+                    <label>Frame Color:</label>
+                    <div class="color-picker">
+                        <input type="color" id="frameColor" value="#e0e0e0">
+                        <span id="frameColorCode">#e0e0e0</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="frameThickness">Frame Thickness (px):</label>
+                        <input type="number" id="frameThickness" value="2" min="0" max="20">
+                    </div>
 
-            <label for="frameRadius">Frame Edge Rounding (px):</label>
-            <input type="number" id="frameRadius" value="8" min="0">
+                    <div class="form-group">
+                        <label for="frameRadius">Frame Edge Rounding (px):</label>
+                        <input type="number" id="frameRadius" value="12" min="0" max="50">
+                    </div>
+                </div>
+            </div>
             
-            <label for="fontFamily">Content Font:</label>
-            <select id="fontFamily">
-                <option value="Arial">Arial</option>
-                <option value="Verdana">Verdana</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Courier New">Courier New</option>
-            </select>
+            <div class="settings-group">
+                <div class="settings-group-title">Content Settings</div>
+                
+                <div class="form-group">
+                    <label for="fontFamily">Content Font:</label>
+                    <select id="fontFamily">
+                        <option value="Arial">Arial</option>
+                        <option value="'Segoe UI'">Segoe UI</option>
+                        <option value="Verdana">Verdana</option>
+                        <option value="'Trebuchet MS'">Trebuchet MS</option>
+                        <option value="'Helvetica Neue'">Helvetica Neue</option>
+                        <option value="'Times New Roman'">Times New Roman</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Garamond">Garamond</option>
+                        <option value="'Courier New'">Courier New</option>
+                        <option value="'Palatino Linotype'">Palatino Linotype</option>
+                        <option value="'Book Antiqua'">Book Antiqua</option>
+                        <option value="'Century Gothic'">Century Gothic</option>
+                        <option value="Tahoma">Tahoma</option>
+                        <option value="'Lucida Sans'">Lucida Sans</option>
+                        <option value="'Lucida Grande'">Lucida Grande</option>
+                        <option value="Impact">Impact</option>
+                        <option value="'Franklin Gothic Medium'">Franklin Gothic</option>
+                        <option value="'Gill Sans'">Gill Sans</option>
+                        <option value="'Trebuchet MS'">Trebuchet MS</option>
+                        <option value="'Arial Narrow'">Arial Narrow</option>
+                        <option value="'Roboto', sans-serif">Roboto</option>
+                        <option value="'Open Sans', sans-serif">Open Sans</option>
+                        <option value="'Montserrat', sans-serif">Montserrat</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="fontSize">Content Font Size (px):</label>
+                    <input type="number" id="fontSize" value="18" min="10" max="40">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="showTime" checked>
+                    <label for="showTime">Show Hours & Minutes</label>
+                </div>
+            </div>
             
-            <label for="fontSize">Content Font Size (px):</label>
-            <input type="number" id="fontSize" value="16" min="10" max="40">
-            
-            <label for="showTime">Show Hours & Minutes:</label>
-            <input type="checkbox" id="showTime" checked>
-            
-            <button onclick="applySettings()">Apply</button>
-            <button onclick="closeSettings()">Close</button>
-            <button onclick="saveSettings()">Save Settings</button>
+            <div class="button-group">
+                <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+                <button onclick="applyAndSaveSettings()">Save Changes</button>
+            </div>
         </div>
     </div>
 
@@ -136,9 +383,25 @@
             loadSettings();
             updateCountdown();
             
-            // Set the due date input's value
-            const dateInputValue = expectedBirthDate.toISOString().split('T')[0];
-            document.getElementById('dueDateInput').value = dateInputValue;
+            // Set the due date input's value if it's not already set
+            if (!document.getElementById('dueDateInput').value) {
+                const dateInputValue = expectedBirthDate.toISOString().split('T')[0];
+                document.getElementById('dueDateInput').value = dateInputValue;
+            }
+            
+            // Add event listeners for color pickers to update text displays
+            document.getElementById('bgColor').addEventListener('input', function() {
+                document.getElementById('bgColorCode').textContent = this.value;
+            });
+            
+            document.getElementById('frameColor').addEventListener('input', function() {
+                document.getElementById('frameColorCode').textContent = this.value;
+            });
+            
+            // Toggle frame settings visibility based on checkbox
+            document.getElementById('showFrame').addEventListener('change', function() {
+                document.getElementById('frameSettings').style.display = this.checked ? 'block' : 'none';
+            });
         };
         
         // Function to update the countdown and age display
@@ -146,6 +409,8 @@
             const now = new Date();
             const timeDiff = expectedBirthDate - now;
             const showHoursMinutes = document.getElementById('showTime').checked;
+            const babyName = document.getElementById('babyName').value.trim();
+            const namePrefix = babyName ? babyName : "Baby";
 
             if (timeDiff > 0) {
                 const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
@@ -160,7 +425,7 @@
                 const months = babyAge.getUTCMonth();
                 const days = babyAge.getUTCDate() - 1; // Adjust for how Date object works
                 document.getElementById('age').style.display = 'block';
-                document.getElementById('age').innerHTML = `Baby is ${months} months and ${days} days old`;
+                document.getElementById('age').innerHTML = `${namePrefix} is ${months} months and ${days} days old`;
                 document.getElementById('countdown').style.display = 'none';
             }
         }
@@ -178,8 +443,8 @@
             document.getElementById('settingsPopup').style.display = 'none';
         }
 
-        // Apply the settings from the form
-        function applySettings() {
+        // Apply and save settings in one function
+        function applyAndSaveSettings() {
             // Get the due date value and update the expectedBirthDate
             const dueDateInput = document.getElementById('dueDateInput').value;
             if (dueDateInput) {
@@ -187,6 +452,8 @@
             }
             
             const bgColor = document.getElementById('bgColor').value;
+            const showFrame = document.getElementById('showFrame').checked;
+            const frameColor = document.getElementById('frameColor').value;
             const frameThickness = document.getElementById('frameThickness').value;
             const frameRadius = document.getElementById('frameRadius').value;
             const fontFamily = document.getElementById('fontFamily').value;
@@ -195,11 +462,22 @@
             const titleSize = document.getElementById('titleSize').value;
             const titleFont = document.getElementById('titleFont').value;
             const showTitle = document.getElementById('showTitle').checked;
+            const babyName = document.getElementById('babyName').value;
 
             // Apply settings to the container
             document.querySelector('.container').style.backgroundColor = bgColor;
-            document.querySelector('.container').style.borderWidth = `${frameThickness}px`;
-            document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
+            
+            if (showFrame) {
+                document.querySelector('.container').style.borderWidth = `${frameThickness}px`;
+                document.querySelector('.container').style.borderColor = frameColor;
+                document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
+                document.querySelector('.container').style.borderStyle = 'solid';
+            } else {
+                document.querySelector('.container').style.border = 'none';
+                document.querySelector('.container').style.borderRadius = '0';
+                // Apply background color to the whole page if frame is disabled
+                document.body.style.backgroundColor = bgColor;
+            }
             
             // Apply settings to the content
             document.querySelector('.countdown').style.fontFamily = fontFamily;
@@ -216,8 +494,11 @@
             // Update the countdown with new settings
             updateCountdown();
             
-            // Save the settings
+            // Save all settings to localStorage
             saveSettings();
+            
+            // Close the settings panel
+            closeSettings();
         }
         
         // Function to save settings to localStorage
@@ -225,6 +506,8 @@
             const settings = {
                 dueDate: document.getElementById('dueDateInput').value,
                 bgColor: document.getElementById('bgColor').value,
+                frameColor: document.getElementById('frameColor').value,
+                showFrame: document.getElementById('showFrame').checked,
                 frameThickness: document.getElementById('frameThickness').value,
                 frameRadius: document.getElementById('frameRadius').value,
                 fontFamily: document.getElementById('fontFamily').value,
@@ -233,7 +516,8 @@
                 titleText: document.getElementById('titleText').value,
                 titleSize: document.getElementById('titleSize').value,
                 titleFont: document.getElementById('titleFont').value,
-                showTitle: document.getElementById('showTitle').checked
+                showTitle: document.getElementById('showTitle').checked,
+                babyName: document.getElementById('babyName').value
             };
             
             localStorage.setItem('babyCountdownSettings', JSON.stringify(settings));
@@ -252,11 +536,23 @@
                     expectedBirthDate = new Date(settings.dueDate + 'T00:00:00');
                 }
                 
+                if (settings.babyName !== undefined) {
+                    document.getElementById('babyName').value = settings.babyName;
+                }
+                
                 document.getElementById('bgColor').value = settings.bgColor || '#ffffff';
+                document.getElementById('bgColorCode').textContent = settings.bgColor || '#ffffff';
+                
+                document.getElementById('showFrame').checked = settings.showFrame !== undefined ? settings.showFrame : true;
+                document.getElementById('frameSettings').style.display = settings.showFrame !== false ? 'block' : 'none';
+                
+                document.getElementById('frameColor').value = settings.frameColor || '#e0e0e0';
+                document.getElementById('frameColorCode').textContent = settings.frameColor || '#e0e0e0';
+                
                 document.getElementById('frameThickness').value = settings.frameThickness || 2;
-                document.getElementById('frameRadius').value = settings.frameRadius || 8;
+                document.getElementById('frameRadius').value = settings.frameRadius || 12;
                 document.getElementById('fontFamily').value = settings.fontFamily || 'Arial';
-                document.getElementById('fontSize').value = settings.fontSize || 16;
+                document.getElementById('fontSize').value = settings.fontSize || 18;
                 document.getElementById('showTime').checked = settings.showTime !== undefined ? settings.showTime : true;
                 document.getElementById('titleText').value = settings.titleText || 'Baby Due Date Countdown';
                 document.getElementById('titleSize').value = settings.titleSize || 24;
@@ -264,7 +560,7 @@
                 document.getElementById('showTitle').checked = settings.showTitle !== undefined ? settings.showTitle : true;
                 
                 // Apply the loaded settings
-                applySettings();
+                applyAndSaveSettings();
             }
         }
     </script>
