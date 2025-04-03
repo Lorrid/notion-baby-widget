@@ -40,7 +40,20 @@
             position: relative;
             width: 350px;
             box-shadow: none;
+            filter: none;
+            -webkit-filter: none;
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
             transition: all 0.3s;
+        }
+        
+        /* Additional styles for embedded mode */
+        body.embedded .container {
+            box-shadow: none !important;
+            filter: none !important;
+            -webkit-filter: none !important;
+            -webkit-box-shadow: none !important;
+            -moz-box-shadow: none !important;
         }
 
         .title {
