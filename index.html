@@ -59,22 +59,36 @@
             position: fixed;
             top: 15px;
             right: 15px;
-            font-size: 22px;
+            font-size: 16px;
             cursor: pointer;
-            width: 40px;
-            height: 40px;
-            background-color: var(--panel-bg);
-            color: var(--primary-color);
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            color: #888;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             transition: all 0.2s;
+            opacity: 0.3;
         }
 
         .settings-btn:hover {
             transform: rotate(30deg);
+            opacity: 1;
+        }
+        
+        /* Style for embedded mode */
+        body.embedded .settings-btn {
+            opacity: 0;
+        }
+        
+        body.embedded:hover .settings-btn {
+            opacity: 0.7;
+        }
+        
+        body.embedded .settings-btn:hover {
+            opacity: 1;
         }
 
         .settings-popup {
@@ -211,6 +225,23 @@
         .settings-panel button.btn-cancel:hover {
             background-color: rgba(67, 97, 238, 0.1);
         }
+
+        .theme-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .theme-option label {
+            margin-bottom: 0;
+            display: inline;
+        }
     </style>
 </head>
 <body>
@@ -314,12 +345,26 @@
                     
                     <div class="form-group">
                         <label for="frameThickness">Frame Thickness (px):</label>
-                        <input type="number" id="frameThickness" value="2" min="0" max="20">
+                        <input type="number" id="frameThickness" value="2" min="1" max="10">
                     </div>
-
+                    
                     <div class="form-group">
                         <label for="frameRadius">Frame Edge Rounding (px):</label>
                         <input type="number" id="frameRadius" value="12" min="0" max="50">
+                    </div>
+                </div>
+                
+                <div class="form-group" id="notionThemeSettings">
+                    <label>Notion Theme Background:</label>
+                    <div class="theme-options">
+                        <div class="theme-option">
+                            <input type="radio" id="themeWhite" name="notionTheme" value="white" checked>
+                            <label for="themeWhite">White</label>
+                        </div>
+                        <div class="theme-option">
+                            <input type="radio" id="themeBlack" name="notionTheme" value="black">
+                            <label for="themeBlack">Black</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -378,18 +423,48 @@
         // Default due date (will be overridden by user settings)
         let expectedBirthDate = new Date('2025-08-01T00:00:00');
         
-        // Load settings when page loads
+        // Check if widget is embedded in an iframe (Notion)
+        function checkIfEmbedded() {
+            try {
+                return window.self !== window.top;
+            } catch (e) {
+                return true; // If we can't access parent, we're likely in an iframe
+            }
+        }
+        
+        // Apply embedded mode if needed
+        function applyEmbeddedMode() {
+            const isEmbedded = checkIfEmbedded();
+            if (isEmbedded) {
+                document.body.classList.add('embedded');
+                
+                // Get URL parameters for settings
+                const urlParams = new URLSearchParams(window.location.search);
+                
+                // If URL has settings parameter, use it to override localStorage
+                if (urlParams.has('settings')) {
+                    try {
+                        const decodedSettings = decodeURIComponent(urlParams.get('settings'));
+                        localStorage.setItem('babyCountdownSettings', decodedSettings);
+                    } catch (e) {
+                        console.error('Error parsing settings from URL', e);
+                    }
+                }
+            }
+        }
+        
+        // Function to run when page loads
         window.onload = function() {
+            // Check if embedded and apply appropriate mode
+            applyEmbeddedMode();
+            
+            // Load settings from localStorage
             loadSettings();
+            
+            // Initial countdown update
             updateCountdown();
             
-            // Set the due date input's value if it's not already set
-            if (!document.getElementById('dueDateInput').value) {
-                const dateInputValue = expectedBirthDate.toISOString().split('T')[0];
-                document.getElementById('dueDateInput').value = dateInputValue;
-            }
-            
-            // Add event listeners for color pickers to update text displays
+            // Add event listeners for color pickers
             document.getElementById('bgColor').addEventListener('input', function() {
                 document.getElementById('bgColorCode').textContent = this.value;
             });
@@ -398,7 +473,7 @@
                 document.getElementById('frameColorCode').textContent = this.value;
             });
             
-            // Toggle frame settings visibility based on checkbox
+            // Toggle frame settings visibility
             document.getElementById('showFrame').addEventListener('change', function() {
                 document.getElementById('frameSettings').style.display = this.checked ? 'block' : 'none';
             });
@@ -445,12 +520,7 @@
 
         // Apply and save settings in one function
         function applyAndSaveSettings() {
-            // Get the due date value and update the expectedBirthDate
-            const dueDateInput = document.getElementById('dueDateInput').value;
-            if (dueDateInput) {
-                expectedBirthDate = new Date(dueDateInput + 'T00:00:00');
-            }
-            
+            // Get values from form
             const bgColor = document.getElementById('bgColor').value;
             const showFrame = document.getElementById('showFrame').checked;
             const frameColor = document.getElementById('frameColor').value;
@@ -458,44 +528,45 @@
             const frameRadius = document.getElementById('frameRadius').value;
             const fontFamily = document.getElementById('fontFamily').value;
             const fontSize = document.getElementById('fontSize').value;
+            const showTime = document.getElementById('showTime').checked;
             const titleText = document.getElementById('titleText').value;
             const titleSize = document.getElementById('titleSize').value;
             const titleFont = document.getElementById('titleFont').value;
             const showTitle = document.getElementById('showTitle').checked;
             const babyName = document.getElementById('babyName').value;
-
-            // Apply settings to the container
+            const notionTheme = document.querySelector('input[name="notionTheme"]:checked').value;
+            
+            // Update the UI
+            document.body.style.backgroundColor = notionTheme === 'white' ? '#ffffff' : '#191919';
             document.querySelector('.container').style.backgroundColor = bgColor;
             
             if (showFrame) {
-                document.querySelector('.container').style.borderWidth = `${frameThickness}px`;
-                document.querySelector('.container').style.borderColor = frameColor;
+                document.querySelector('.container').style.border = `${frameThickness}px solid ${frameColor}`;
                 document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
-                document.querySelector('.container').style.borderStyle = 'solid';
-                document.querySelector('.container').style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.08)';
-                document.querySelector('.container').style.backgroundColor = bgColor;
-                document.body.style.backgroundColor = 'var(--bg-color)'; // Reset body to default background
             } else {
                 document.querySelector('.container').style.border = 'none';
-                document.querySelector('.container').style.borderRadius = '0';
-                document.querySelector('.container').style.boxShadow = 'none'; // Remove the box shadow
-                document.body.style.backgroundColor = bgColor; // Apply background color to the whole page
-                document.querySelector('.container').style.backgroundColor = 'transparent'; // Make container transparent
             }
             
-            // Apply settings to the content
-            document.querySelector('.countdown').style.fontFamily = fontFamily;
-            document.querySelector('.age').style.fontFamily = fontFamily;
+            document.querySelector('.container').style.fontFamily = fontFamily;
             document.querySelector('.countdown').style.fontSize = `${fontSize}px`;
             document.querySelector('.age').style.fontSize = `${fontSize}px`;
             
-            // Apply settings to the title
-            document.getElementById('title').textContent = titleText;
-            document.getElementById('title').style.fontSize = `${titleSize}px`;
-            document.getElementById('title').style.fontFamily = titleFont;
-            document.getElementById('title').style.display = showTitle ? 'block' : 'none';
+            if (showTitle) {
+                document.getElementById('title').style.display = 'block';
+                document.getElementById('title').textContent = titleText;
+                document.getElementById('title').style.fontSize = `${titleSize}px`;
+                document.getElementById('title').style.fontFamily = titleFont;
+            } else {
+                document.getElementById('title').style.display = 'none';
+            }
             
-            // Update the countdown with new settings
+            // Update due date
+            const dueDateInput = document.getElementById('dueDateInput').value;
+            if (dueDateInput) {
+                expectedBirthDate = new Date(dueDateInput + 'T00:00:00');
+            }
+            
+            // Update countdown
             updateCountdown();
             
             // Save all settings to localStorage
@@ -503,6 +574,11 @@
             
             // Close the settings panel
             closeSettings();
+            
+            // Update URL with settings for embedded mode
+            if (checkIfEmbedded()) {
+                updateEmbedUrl();
+            }
         }
         
         // Function to save settings to localStorage
@@ -521,10 +597,21 @@
                 titleSize: document.getElementById('titleSize').value,
                 titleFont: document.getElementById('titleFont').value,
                 showTitle: document.getElementById('showTitle').checked,
-                babyName: document.getElementById('babyName').value
+                babyName: document.getElementById('babyName').value,
+                notionTheme: document.querySelector('input[name="notionTheme"]:checked').value
             };
             
             localStorage.setItem('babyCountdownSettings', JSON.stringify(settings));
+        }
+        
+        // Function to update the URL with settings for embedded mode
+        function updateEmbedUrl() {
+            const settings = localStorage.getItem('babyCountdownSettings');
+            if (settings) {
+                const encodedSettings = encodeURIComponent(settings);
+                const newUrl = window.location.pathname + '?settings=' + encodedSettings;
+                window.history.replaceState({}, document.title, newUrl);
+            }
         }
         
         // Function to load settings from localStorage
@@ -562,6 +649,11 @@
                 document.getElementById('titleSize').value = settings.titleSize || 24;
                 document.getElementById('titleFont').value = settings.titleFont || 'Arial';
                 document.getElementById('showTitle').checked = settings.showTitle !== undefined ? settings.showTitle : true;
+                
+                // Set Notion theme
+                if (settings.notionTheme) {
+                    document.getElementById(settings.notionTheme === 'white' ? 'themeWhite' : 'themeBlack').checked = true;
+                }
                 
                 // Apply the loaded settings
                 applyAndSaveSettings();
