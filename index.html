@@ -29,7 +29,7 @@
             margin: 10px 0;
         }
         .settings-btn {
-            position: absolute;
+            position: fixed;
             top: 10px;
             right: 10px;
             font-size: 20px;
@@ -51,26 +51,53 @@
             padding: 20px;
             border-radius: 8px;
             width: 300px;
+            max-height: 80vh;
+            overflow-y: auto;
         }
         .settings-panel input,
         .settings-panel select {
             margin-bottom: 10px;
             width: 100%;
         }
+        .title {
+            margin-top: 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Baby Due Date Countdown</h2>
+        <h2 id="title" class="title">Baby Due Date Countdown</h2>
         <div id="countdown" class="countdown"></div>
         <div id="age" class="age" style="display:none;"></div>
-        <div class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></div>
     </div>
+    
+    <div class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></div>
 
     <!-- Settings Popup -->
     <div class="settings-popup" id="settingsPopup">
         <div class="settings-panel">
             <h3>Settings</h3>
+            
+            <label for="dueDateInput">Due Date:</label>
+            <input type="date" id="dueDateInput">
+            
+            <label for="titleText">Title Text:</label>
+            <input type="text" id="titleText" value="Baby Due Date Countdown">
+            
+            <label for="titleSize">Title Size (px):</label>
+            <input type="number" id="titleSize" value="24" min="10" max="50">
+            
+            <label for="titleFont">Title Font:</label>
+            <select id="titleFont">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Courier New">Courier New</option>
+            </select>
+            
+            <label for="showTitle">Show Title:</label>
+            <input type="checkbox" id="showTitle" checked>
+            
             <label for="bgColor">Background Color:</label>
             <input type="color" id="bgColor" value="#ffffff">
             
@@ -80,7 +107,7 @@
             <label for="frameRadius">Frame Edge Rounding (px):</label>
             <input type="number" id="frameRadius" value="8" min="0">
             
-            <label for="fontFamily">Font:</label>
+            <label for="fontFamily">Content Font:</label>
             <select id="fontFamily">
                 <option value="Arial">Arial</option>
                 <option value="Verdana">Verdana</option>
@@ -88,7 +115,7 @@
                 <option value="Courier New">Courier New</option>
             </select>
             
-            <label for="fontSize">Font Size (px):</label>
+            <label for="fontSize">Content Font Size (px):</label>
             <input type="number" id="fontSize" value="16" min="10" max="40">
             
             <label for="showTime">Show Hours & Minutes:</label>
@@ -96,12 +123,23 @@
             
             <button onclick="applySettings()">Apply</button>
             <button onclick="closeSettings()">Close</button>
+            <button onclick="saveSettings()">Save Settings</button>
         </div>
     </div>
 
     <script>
-        // Set the expected birth date here
-        const expectedBirthDate = new Date('2025-08-01T00:00:00'); // Example: Set your expected date here
+        // Default due date (will be overridden by user settings)
+        let expectedBirthDate = new Date('2025-08-01T00:00:00');
+        
+        // Load settings when page loads
+        window.onload = function() {
+            loadSettings();
+            updateCountdown();
+            
+            // Set the due date input's value
+            const dateInputValue = expectedBirthDate.toISOString().split('T')[0];
+            document.getElementById('dueDateInput').value = dateInputValue;
+        };
         
         // Function to update the countdown and age display
         function updateCountdown() {
@@ -116,10 +154,11 @@
                 const timeStr = showHoursMinutes ? `${hours} hours, ${minutes} minutes` : '';
                 document.getElementById('countdown').innerHTML = `${days} days ${timeStr} until birth`;
                 document.getElementById('age').style.display = 'none';
+                document.getElementById('countdown').style.display = 'block';
             } else {
                 const babyAge = new Date(now - expectedBirthDate);
                 const months = babyAge.getUTCMonth();
-                const days = babyAge.getUTCDate();
+                const days = babyAge.getUTCDate() - 1; // Adjust for how Date object works
                 document.getElementById('age').style.display = 'block';
                 document.getElementById('age').innerHTML = `Baby is ${months} months and ${days} days old`;
                 document.getElementById('countdown').style.display = 'none';
@@ -128,7 +167,6 @@
 
         // Set interval for countdown update
         setInterval(updateCountdown, 60000); // Update every minute
-        updateCountdown(); // Initial update
 
         // Function to open settings panel
         function openSettings() {
@@ -142,20 +180,92 @@
 
         // Apply the settings from the form
         function applySettings() {
+            // Get the due date value and update the expectedBirthDate
+            const dueDateInput = document.getElementById('dueDateInput').value;
+            if (dueDateInput) {
+                expectedBirthDate = new Date(dueDateInput + 'T00:00:00');
+            }
+            
             const bgColor = document.getElementById('bgColor').value;
             const frameThickness = document.getElementById('frameThickness').value;
             const frameRadius = document.getElementById('frameRadius').value;
             const fontFamily = document.getElementById('fontFamily').value;
             const fontSize = document.getElementById('fontSize').value;
+            const titleText = document.getElementById('titleText').value;
+            const titleSize = document.getElementById('titleSize').value;
+            const titleFont = document.getElementById('titleFont').value;
+            const showTitle = document.getElementById('showTitle').checked;
 
             // Apply settings to the container
             document.querySelector('.container').style.backgroundColor = bgColor;
             document.querySelector('.container').style.borderWidth = `${frameThickness}px`;
             document.querySelector('.container').style.borderRadius = `${frameRadius}px`;
+            
+            // Apply settings to the content
             document.querySelector('.countdown').style.fontFamily = fontFamily;
             document.querySelector('.age').style.fontFamily = fontFamily;
             document.querySelector('.countdown').style.fontSize = `${fontSize}px`;
             document.querySelector('.age').style.fontSize = `${fontSize}px`;
+            
+            // Apply settings to the title
+            document.getElementById('title').textContent = titleText;
+            document.getElementById('title').style.fontSize = `${titleSize}px`;
+            document.getElementById('title').style.fontFamily = titleFont;
+            document.getElementById('title').style.display = showTitle ? 'block' : 'none';
+            
+            // Update the countdown with new settings
+            updateCountdown();
+            
+            // Save the settings
+            saveSettings();
+        }
+        
+        // Function to save settings to localStorage
+        function saveSettings() {
+            const settings = {
+                dueDate: document.getElementById('dueDateInput').value,
+                bgColor: document.getElementById('bgColor').value,
+                frameThickness: document.getElementById('frameThickness').value,
+                frameRadius: document.getElementById('frameRadius').value,
+                fontFamily: document.getElementById('fontFamily').value,
+                fontSize: document.getElementById('fontSize').value,
+                showTime: document.getElementById('showTime').checked,
+                titleText: document.getElementById('titleText').value,
+                titleSize: document.getElementById('titleSize').value,
+                titleFont: document.getElementById('titleFont').value,
+                showTitle: document.getElementById('showTitle').checked
+            };
+            
+            localStorage.setItem('babyCountdownSettings', JSON.stringify(settings));
+        }
+        
+        // Function to load settings from localStorage
+        function loadSettings() {
+            const savedSettings = localStorage.getItem('babyCountdownSettings');
+            
+            if (savedSettings) {
+                const settings = JSON.parse(savedSettings);
+                
+                // Update form values
+                if (settings.dueDate) {
+                    document.getElementById('dueDateInput').value = settings.dueDate;
+                    expectedBirthDate = new Date(settings.dueDate + 'T00:00:00');
+                }
+                
+                document.getElementById('bgColor').value = settings.bgColor || '#ffffff';
+                document.getElementById('frameThickness').value = settings.frameThickness || 2;
+                document.getElementById('frameRadius').value = settings.frameRadius || 8;
+                document.getElementById('fontFamily').value = settings.fontFamily || 'Arial';
+                document.getElementById('fontSize').value = settings.fontSize || 16;
+                document.getElementById('showTime').checked = settings.showTime !== undefined ? settings.showTime : true;
+                document.getElementById('titleText').value = settings.titleText || 'Baby Due Date Countdown';
+                document.getElementById('titleSize').value = settings.titleSize || 24;
+                document.getElementById('titleFont').value = settings.titleFont || 'Arial';
+                document.getElementById('showTitle').checked = settings.showTitle !== undefined ? settings.showTitle : true;
+                
+                // Apply the loaded settings
+                applySettings();
+            }
         }
     </script>
 </body>
