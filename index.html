@@ -21,6 +21,8 @@
             --button-bg: #4361ee;
             --button-hover: #3a56d4;
             --button-text: white;
+            --settings-title-color: #333333;
+            --settings-group-title: #555555;
         }
 
         body {
@@ -124,26 +126,28 @@
 
         .settings-panel {
             background-color: var(--panel-bg);
-            padding: 25px;
+            padding: 22px;
             border-radius: 12px;
             width: 400px;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            font-size: 14px;
         }
 
         .settings-panel h3 {
             margin-top: 0;
-            color: var(--primary-color);
-            font-size: 22px;
+            color: var(--settings-title-color);
+            font-size: 18px;
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
+            font-weight: 600;
         }
 
         .settings-group {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -155,17 +159,19 @@
         .settings-group-title {
             font-weight: 600;
             margin-bottom: 10px;
-            color: var(--primary-color);
+            color: var(--settings-group-title);
+            font-size: 15px;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .settings-panel label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             font-weight: 500;
+            font-size: 13px;
         }
 
         .settings-panel input[type="text"],
@@ -173,11 +179,11 @@
         .settings-panel input[type="number"],
         .settings-panel select {
             width: 100%;
-            padding: 8px 12px;
+            padding: 8px 10px;
             border: 1px solid var(--input-border);
             border-radius: 6px;
             background-color: var(--input-bg);
-            font-size: 14px;
+            font-size: 13px;
             transition: border 0.2s;
         }
 
@@ -192,40 +198,51 @@
         .color-picker {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .color-picker input[type="color"] {
-            width: 50px;
+            width: 40px;
             height: 30px;
-            border: 1px solid var(--input-border);
+            border: none;
             border-radius: 4px;
-            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .color-picker span {
+            font-size: 12px;
+            font-family: monospace;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
+            gap: 8px;
         }
 
         .checkbox-group input[type="checkbox"] {
-            margin-right: 10px;
+            margin: 0;
+        }
+
+        .checkbox-group label {
+            display: inline;
+            margin-bottom: 0;
         }
 
         .button-group {
             display: flex;
             justify-content: flex-end;
-            margin-top: 20px;
             gap: 10px;
+            margin-top: 20px;
         }
 
         .settings-panel button {
             padding: 8px 16px;
-            background-color: var(--button-bg);
-            color: var(--button-text);
             border: none;
             border-radius: 6px;
-            cursor: pointer;
             font-weight: 500;
+            cursor: pointer;
+            font-size: 13px;
             transition: background-color 0.2s;
         }
 
@@ -279,6 +296,23 @@
             color: var(--primary-color);
             border-bottom: 1px solid var(--border-color);
             padding-bottom: 3px;
+        }
+        
+        .settings-message {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            padding: 12px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #555;
+        }
+        
+        /* Fix button styling */
+        .settings-panel button {
+            background-color: var(--button-bg);
+            color: var(--button-text);
         }
     </style>
 </head>
@@ -567,6 +601,29 @@
                     }
                 }
             }
+            
+            // Check if we're in settings mode
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('mode') && urlParams.get('mode') === 'settings') {
+                // We're in the GitHub page in settings mode
+                // Open settings panel immediately
+                document.getElementById('settingsPopup').style.display = 'flex';
+                
+                // Add a message to indicate we're in settings mode
+                const settingsMessage = document.createElement('div');
+                settingsMessage.className = 'settings-message';
+                settingsMessage.innerHTML = 'You are editing settings for your embedded widget. <br>Changes will be applied when you save.';
+                document.querySelector('.settings-panel').prepend(settingsMessage);
+                
+                // Add event listener to the save button to close the window after saving
+                document.querySelector('.settings-panel button:not(.btn-cancel)').addEventListener('click', function() {
+                    // Wait a moment for settings to save
+                    setTimeout(function() {
+                        // Show confirmation message
+                        alert('Settings saved! You can now close this window and refresh your Notion page to see the changes.');
+                    }, 500);
+                });
+            }
         }
         
         // Function to run when page loads
@@ -673,7 +730,25 @@
 
         // Function to open settings panel
         function openSettings() {
-            document.getElementById('settingsPopup').style.display = 'flex';
+            // If in embedded mode, open settings in GitHub page
+            if (checkIfEmbedded()) {
+                // Get current settings
+                const currentSettings = localStorage.getItem('babyCountdownSettings');
+                
+                // Create the GitHub page URL with settings as a parameter
+                const baseUrl = window.location.href.split('?')[0]; // Remove any existing parameters
+                const githubUrl = baseUrl + '?mode=settings';
+                
+                if (currentSettings) {
+                    // Add current settings as a parameter
+                    window.open(githubUrl + '&settings=' + encodeURIComponent(currentSettings), '_blank');
+                } else {
+                    window.open(githubUrl, '_blank');
+                }
+            } else {
+                // Regular behavior for non-embedded mode
+                document.getElementById('settingsPopup').style.display = 'flex';
+            }
         }
 
         // Function to close settings panel
@@ -772,8 +847,12 @@
             const settings = localStorage.getItem('babyCountdownSettings');
             if (settings) {
                 const encodedSettings = encodeURIComponent(settings);
-                const newUrl = window.location.pathname + '?settings=' + encodedSettings;
-                window.history.replaceState({}, document.title, newUrl);
+                // Only update the URL if we're not in settings mode
+                const urlParams = new URLSearchParams(window.location.search);
+                if (!urlParams.has('mode')) {
+                    const newUrl = window.location.pathname + '?settings=' + encodedSettings;
+                    window.history.replaceState({}, document.title, newUrl);
+                }
             }
         }
         
